@@ -1,11 +1,10 @@
-package com.curso.cursospringboot.controllers;
+package com.Springboot.ProyectoReny.controllers;
 
-import com.curso.cursospringboot.models.Usuario;
+import com.Springboot.ProyectoReny.models.Usuario;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/app")
@@ -23,6 +22,8 @@ public class indexController {
         Usuario usuario = new Usuario();
         usuario.setNombre("Reny");
         usuario.setApellido("Baca");
+        usuario.setEmail("google.com");
+        usuario.setPassword("newPAss");
         model.addAttribute("usuario",  usuario);
         model.addAttribute("titulo", "Perfil del usuario: " + usuario.getNombre());
         return "perfil";

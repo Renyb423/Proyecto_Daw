@@ -1,10 +1,10 @@
-package com.curso.cursospringboot;
+package com.Springboot.ProyectoReny;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CursoSpringbootApplicationTests {
+class SpringbootApplicationTests {
 
     @Test
     void contextLoads() {
