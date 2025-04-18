@@ -1,10 +1,11 @@
 package com.Springboot.ProyectoReny.controllers;
 
-import com.Springboot.ProyectoReny.models.Usuario;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.Springboot.ProyectoReny.entities.Usuario;
 
 @Controller
 @RequestMapping("/app")
