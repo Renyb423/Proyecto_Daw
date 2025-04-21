@@ -10,11 +10,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name="users")
-public class Usuario {
+public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +28,12 @@ public class Usuario {
   private String email;
   private String password;
 
-  @ManyToMany
+  @Transient
+  private boolean admin;
+
+  
+
+    @ManyToMany
   @JoinTable (
     name = "user_roles",
     joinColumns = @JoinColumn(name="user_id"),
@@ -81,5 +87,13 @@ public class Usuario {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 }

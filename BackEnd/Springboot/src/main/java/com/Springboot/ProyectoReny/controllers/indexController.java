@@ -5,7 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.Springboot.ProyectoReny.entities.Usuario;
+import com.Springboot.ProyectoReny.entities.User;
 
 @Controller
 @RequestMapping("/app")
@@ -20,7 +20,7 @@ public class indexController {
     @RequestMapping("/perfil")
     public String perfil(Model model) {
 
-        Usuario usuario = new Usuario();
+        User usuario = new User();
         usuario.setNombre("Reny");
         usuario.setApellido("Baca");
         usuario.setEmail("google.com");
