@@ -19,7 +19,7 @@ import com.Springboot.ProyectoReny.entities.User;
 import com.Springboot.ProyectoReny.services.UserService;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
