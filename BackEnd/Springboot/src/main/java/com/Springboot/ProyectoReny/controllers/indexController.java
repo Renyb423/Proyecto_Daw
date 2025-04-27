@@ -21,12 +21,12 @@ public class indexController {
     public String perfil(Model model) {
 
         User usuario = new User();
-        usuario.setNombre("Reny");
+        usuario.setNombreUsuario("Reny");
         usuario.setApellido("Baca");
         usuario.setEmail("google.com");
         usuario.setPassword("newPAss");
         model.addAttribute("usuario",  usuario);
-        model.addAttribute("titulo", "Perfil del usuario: " + usuario.getNombre());
+        model.addAttribute("titulo", "Perfil del usuario: " + usuario.getNombreUsuario());
         return "perfil";
     }
 }

@@ -1,12 +1,15 @@
 package com.Springboot.ProyectoReny.services;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.Springboot.ProyectoReny.entities.Role;
 import com.Springboot.ProyectoReny.entities.User;
 import com.Springboot.ProyectoReny.repositories.RoleRepository;
 import com.Springboot.ProyectoReny.repositories.UserRepository;
@@ -31,6 +34,19 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public User save(User user) {
+        Optional<Role> optionalRoleUser = roleRepository.findByName("ROLE_USER");
+        List<Role> roles = new ArrayList<>();
+
+        optionalRoleUser.ifPresent(roles::add);
+
+        if (user.isAdmin()) {
+            Optional<Role> optionalRoleAdmin = roleRepository.findByName("ROLE_ADMIN");
+            optionalRoleAdmin.ifPresent(roles::add);
+        }
+
+        user.setRoles(roles);
+        String passwordEndcoded = passwordEncoder.encode(user.getPassword());
+        user.setPassword(passwordEndcoded);
         return repository.save(user);
     }
 }
