@@ -22,7 +22,8 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private RoleRepository roleRepository;
-
+    
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -34,13 +35,13 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public User save(User user) {
-        Optional<Role> optionalRoleUser = roleRepository.findByName("ROLE_USER");
+        Optional<Role> optionalRoleUser = roleRepository.findByNombre("ROLE_USER");
         List<Role> roles = new ArrayList<>();
 
         optionalRoleUser.ifPresent(roles::add);
 
         if (user.isAdmin()) {
-            Optional<Role> optionalRoleAdmin = roleRepository.findByName("ROLE_ADMIN");
+            Optional<Role> optionalRoleAdmin = roleRepository.findByNombre("ROLE_ADMIN");
             optionalRoleAdmin.ifPresent(roles::add);
         }
 

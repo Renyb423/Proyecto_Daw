@@ -15,7 +15,7 @@ import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
-@Table(name="users")
+@Table(name="usuario")
 public class User {
 
   @Id
@@ -24,9 +24,13 @@ public class User {
 
   @Column(unique = true)
   @NotBlank
-  private String nombreUsuario;
+  private String nombre;
   
+  @NotBlank
   private String apellido;
+
+  @Column(unique = true)
+  @NotBlank
   private String email;
 
   @NotBlank
@@ -62,12 +66,12 @@ public class User {
         this.id = id;
     }
 
-    public String getNombreUsuario() {
-        return nombreUsuario;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setNombreUsuario(String nombreUsuario) {
-        this.nombreUsuario = nombreUsuario;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
     public String getApellido() {
         return apellido;
