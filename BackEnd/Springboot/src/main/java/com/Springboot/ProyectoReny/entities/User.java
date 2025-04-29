@@ -1,6 +1,8 @@
 package com.Springboot.ProyectoReny.entities;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
@@ -34,6 +37,7 @@ public class User {
   private String email;
 
   @NotBlank
+  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private String password;
 
   @Transient
@@ -44,15 +48,32 @@ public class User {
     @ManyToMany
   @JoinTable (
     name = "user_roles",
-    joinColumns = @JoinColumn(name="user_id"),
+    joinColumns = @JoinColumn(name="usuario_id"),
     inverseJoinColumns = @JoinColumn(name="role_id"),
-    uniqueConstraints = { @UniqueConstraint(columnNames = {"user_id", "role_id" })}
+    uniqueConstraints = { @UniqueConstraint(columnNames = {"usuario_id", "role_id" })}
   )
   private List<Role> roles;
+
+  private boolean enabled;
+
+  @PrePersist
+  public void PrePersist(){
+    enabled = true;
+  }
+
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public List<Role> getRoles() {
         return roles;
     }
+
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
@@ -104,4 +125,6 @@ public class User {
     public void setAdmin(boolean admin) {
         this.admin = admin;
     }
+
+ 
 }
