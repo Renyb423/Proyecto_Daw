@@ -1,6 +1,8 @@
 package com.Springboot.ProyectoReny.entities;
+import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -41,11 +43,12 @@ public class User {
   private String password;
 
   @Transient
+  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private boolean admin;
 
   
-
-    @ManyToMany
+  @JsonIgnoreProperties({"users", "handler", "hibernateLazyInitializer"})
+  @ManyToMany
   @JoinTable (
     name = "user_roles",
     joinColumns = @JoinColumn(name="usuario_id"),
@@ -55,6 +58,10 @@ public class User {
   private List<Role> roles;
 
   private boolean enabled;
+
+  public User() {
+    roles = new ArrayList<>();
+  }
 
   @PrePersist
   public void PrePersist(){

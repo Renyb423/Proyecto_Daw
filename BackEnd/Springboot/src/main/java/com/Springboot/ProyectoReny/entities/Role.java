@@ -1,11 +1,20 @@
 package com.Springboot.ProyectoReny.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name="roles")
@@ -18,8 +27,13 @@ public class Role {
     @Column(unique = true, name = "nombre")
     private String nombre;
 
-    public Role() {
-    }
+    @JsonIgnoreProperties({"users", "handler", "hibernateLazyInitializer"})
+    @ManyToMany(mappedBy = "roles")
+    private List<User> users;
+
+     public Role() {
+    users = new ArrayList<>();
+  }
 
     public Role(String nombre) {
         this.nombre = nombre;
