@@ -50,4 +50,9 @@ public class UserServiceImpl implements UserService{
         user.setPassword(passwordEndcoded);
         return repository.save(user);
     }
+
+    @Override
+    public boolean existsByNombre(String nombre) {
+        return repository.existsByNombre(nombre);
+    }
 }
