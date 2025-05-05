@@ -1,7 +1,8 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {create} from "@/services/UserService.js";
 import { useNavigate } from "react-router-dom";
+import {useAuth} from "@/providers/RoleAuthorization.jsx";
 
 const ROLES = [
     { value: "", label: "Selecciona un rol" },
@@ -10,7 +11,7 @@ const ROLES = [
 ];
 
 
-export default function Page() {
+export default function RegisterPage() {
 
     const [form, setForm] = useState({
         nombre: "",
@@ -25,34 +26,95 @@ export default function Page() {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const { user, loading } = useAuth();
 
+    useEffect(() => {
+        if (!loading && user?.isAuthenticated) {
+            if (user.role === 'ROLE_ADMIN') {
+                navigate('/dashboard_admin');
+            } else if (user.role === 'ROLE_READER') {
+                navigate('/dashboard_reader');
+            } else {
+                // Redirigir a una página por defecto si el rol no se reconoce
+                navigate('/');
+            }
+            console.log(user.role)
+        }
+    }, [user, navigate, loading]);
 
+    if (loading) {
+        return <div>Cargando...</div>;
+    }
 
     const validate = () => {
         const newErrors = {};
 
-        if (!form.nombre.trim()) newErrors.nombre = "El nombre es obligatorio.";
-        if (!form.apellido.trim()) newErrors.apellido = "El apellido es obligatorio.";
-        if (!form.email.trim()) newErrors.email = "El email es obligatorio.";
-        else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(form.email))
+        // Nombre: requerido, min 3, max 20
+        if (!form.nombre.trim()) {
+            newErrors.nombre = "El nombre es obligatorio.";
+        } else if (form.nombre.length < 3) {
+            newErrors.nombre = "El nombre debe tener al menos 3 caracteres.";
+        } else if (form.nombre.length > 20) {
+            newErrors.nombre = "El nombre no debe exceder los 20 caracteres.";
+        }
+
+        // Apellido: requerido, min 3, max 20
+        if (!form.apellido.trim()) {
+            newErrors.apellido = "El apellido es obligatorio.";
+        } else if (form.apellido.length < 3) {
+            newErrors.apellido = "El apellido debe tener al menos 3 caracteres.";
+        } else if (form.apellido.length > 20) {
+            newErrors.apellido = "El apellido no debe exceder los 20 caracteres.";
+        }
+
+        // Email: requerido, formato válido, max 50
+        if (!form.email.trim()) {
+            newErrors.email = "El email es obligatorio.";
+        } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(form.email)) {
             newErrors.email = "El email no es válido.";
+        } else if (form.email.length > 50) {
+            newErrors.email = "El email no debe exceder los 50 caracteres.";
+        }
 
-        if (!form.password) newErrors.password = "La contraseña es obligatoria.";
-        else if (form.password.length < 6)
-            newErrors.password = "Debe tener al menos 6 caracteres.";
+        // Password: requerido, min 6
+        if (!form.password) {
+            newErrors.password = "La contraseña es obligatoria.";
+        } else if (form.password.length < 6) {
+            newErrors.password = "La contraseña debe tener al menos 6 caracteres.";
+        }
 
-        if (!form.rol) newErrors.rol = "Selecciona un rol.";
+        // Rol: requerido
+        if (!form.rol) {
+            newErrors.rol = "Selecciona un rol.";
+        }
 
         return newErrors;
     };
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-        setErrors({ ...errors, [e.target.name]: undefined });
+
+    const handleBlur = (e) => {
+        const field = e.target.name;
+        const newErrors = validate();
+        setErrors({
+            ...errors,
+            [field]: newErrors[field],
+        });
     };
 
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+        setErrors({ ...errors, [e.target.name]: undefined });  // Limpiar el error en caso de nuevo input
+    };
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const validationErrors = validate();
+        setErrors(validationErrors);
+
+        if (Object.keys(validationErrors).length > 0) {
+            return;
+        }
+
         try {
             await create({
                 nombre: form.nombre,
@@ -67,7 +129,7 @@ export default function Page() {
         }
     };
 
-        return (
+        return !user?.isAuthenticated ? (
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
                 <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
                     <h2 className="text-3xl font-bold text-indigo-600 mb-6 text-center">Registrate!</h2>
@@ -93,6 +155,7 @@ export default function Page() {
                                     name="nombre"
                                     value={form.nombre}
                                     onChange={handleChange}
+                                    onBlur={handleBlur}
                                     className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-600 ${errors.nombre ? "border-red-500" : "border-gray-300"}`}
                                     autoComplete="off"
                                 />
@@ -108,6 +171,7 @@ export default function Page() {
                                     name="apellido"
                                     value={form.apellido}
                                     onChange={handleChange}
+                                    onBlur={handleBlur}
                                     className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-600 ${errors.apellido ? "border-red-500" : "border-gray-300"}`}
                                     autoComplete="off"
                                 />
@@ -123,6 +187,7 @@ export default function Page() {
                                     name="email"
                                     value={form.email}
                                     onChange={handleChange}
+                                    onBlur={handleBlur}
                                     className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-600 ${errors.email ? "border-red-500" : "border-gray-300"}`}
                                     autoComplete="off"
                                 />
@@ -138,6 +203,7 @@ export default function Page() {
                                     name="password"
                                     value={form.password}
                                     onChange={handleChange}
+                                    onBlur={handleBlur}
                                     className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-600 ${errors.password ? "border-red-500" : "border-gray-300"}`}
                                     autoComplete="off"
                                 />
@@ -152,6 +218,7 @@ export default function Page() {
                                     name="rol"
                                     value={form.rol}
                                     onChange={handleChange}
+                                    onBlur={handleBlur}
                                     className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-600 ${errors.rol ? "border-red-500" : "border-gray-300"}`}
                                 >
                                     {ROLES.map((role) => (
@@ -193,5 +260,5 @@ export default function Page() {
                     </div>
                 )}
             </div>
-        );
+        ) : null;
 }

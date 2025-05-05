@@ -1,46 +1,79 @@
-import {Link} from "react-router-dom";
-import {useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {login as loginApi} from "@/services/UserService.js";
+import {decodeToken} from "@/helpers/decodeToken.jsx"
+import {useAuth} from "@/providers/RoleAuthorization.jsx"
 
-export default function Page() {
+export default function LoginPage() {
     const [form, setForm] = useState({
-        email: "",
+        nombre: "",
         password: "",
     });
 
     const [errors, setErrors] = useState({});
     const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
+    const { loginUserContext } = useAuth();
+    const { user, loading } = useAuth();
 
-    const validate = () => {
-        const newErrors = {};
+    useEffect(() => {
+        if (!loading && user?.isAuthenticated) {
+            if (user.role === 'ROLE_ADMIN') {
+                navigate('/dashboard_admin');
+            } else if (user.role === 'ROLE_READER') {
+                navigate('/dashboard_reader');
+            } else {
+                // Redirigir a una página por defecto si el rol no se reconoce
+                navigate('/');
+            }
+            console.log(user.role)
+        }
+    }, [user, navigate, loading]);
 
-        if (!form.email.trim()) newErrors.email = "El email es obligatorio.";
-        else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(form.email))
-            newErrors.email = "El email no es válido.";
-
-        if (!form.password) newErrors.password = "La contraseña es obligatoria.";
-        else if (form.password.length < 6)
-            newErrors.password = "Debe tener al menos 6 caracteres.";
-
-        return newErrors;
-    };
+    if (loading) {
+        return <div>Cargando...</div>;
+    }
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
         setErrors({ ...errors, [e.target.name]: undefined });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const validationErrors = validate();
-        setErrors(validationErrors);
 
-        if (Object.keys(validationErrors).length === 0) {
-            setSubmitted(true);
-            // Aquí puedes manejar el login real (API, etc)
+
+        try {
+            const data = await loginApi({ nombre: form.nombre, password: form.password });
+            localStorage.setItem("tokenJWT", data.token);
+
+            const payload = decodeToken(data.token);
+            const authorities = JSON.parse(payload.authorities);
+            const role = authorities[0].authority;
+
+            loginUserContext({
+                role: role,
+                token: data.token,
+                isAuthenticated: true
+            });
+
+            if (role === "ROLE_ADMIN") {
+                navigate("/dashboard_admin");
+            } else if (role === "ROLE_READER") {
+                navigate("/dashboard_reader");
+            }
+            else {
+                console.log("Rol desconocido:", role);
+            }
+
+        } catch (error) {
+            console.log(error.response);
+            setError("Usuario o contraseña incorrectos");
         }
     };
 
-    return (
+    return !user?.isAuthenticated ? (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
             <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
                 <h2 className="text-3xl font-bold text-indigo-600 mb-6 text-center">Iniciar Sesión</h2>
@@ -55,21 +88,24 @@ export default function Page() {
                         </Link>
                     </div>
                 ) : (
+                    <>
                     <form onSubmit={handleSubmit} noValidate>
+                        {error && (
+                            <p className="text-red-500 text-center mb-4">{error}</p>
+                        )}
                         <div className="mb-4">
-                            <label className="block text-gray-700 mb-1" htmlFor="email">
-                                Email
+                            <label className="block text-gray-700 mb-1" htmlFor="nombre">
+                                Nombre de usuario
                             </label>
                             <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                value={form.email}
+                                type="text"
+                                name="nombre"
+                                value={form.nombre}
                                 onChange={handleChange}
-                                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-600 ${errors.email ? "border-red-500" : "border-gray-300"}`}
+                                className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-600 ${errors.nombre ? "border-red-500" : "border-gray-300"}`}
                                 autoComplete="off"
                             />
-                            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                            {errors.nombre && <p className="text-red-500 text-sm mt-1">{errors.nombre}</p>}
                         </div>
                         <div className="mb-6">
                             <label className="block text-gray-700 mb-1" htmlFor="password">
@@ -93,6 +129,7 @@ export default function Page() {
                             Iniciar sesión
                         </button>
                     </form>
+                    </>
                 )}
                 <p className="mt-4 text-center text-gray-500 text-sm">
                     ¿No tienes cuenta?{" "}
@@ -102,5 +139,5 @@ export default function Page() {
                 </p>
             </div>
         </div>
-    )
+    ) : null;
 }
