@@ -5,7 +5,7 @@ function AdminRoute() {
     const { user, loading  } = useAuth();
     console.log(user.role);
     if (!loading && (!user.isAuthenticated || user.role !== "ROLE_ADMIN")) {
-        return <Navigate to="/404" replace />;
+        return <Navigate to="/" replace />;
     }
 
     return <Outlet />;

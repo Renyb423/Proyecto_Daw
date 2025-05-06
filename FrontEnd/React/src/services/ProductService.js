@@ -5,70 +5,102 @@ const initProducts = [
         id: 1,
         name: 'Monitor Samsung 65',
         price: 500,
-        description: 'El monitor es increible!'
+        description: 'El monitor es increíble!'
     },
     {
         id: 2,
         name: 'IPhone 14',
         price: 800,
-        description: 'El telefono es muy bueno!'
+        description: 'El teléfono es muy bueno!'
     }
 ];
 
-const baseUrl = 'http://localhost:8080/products';
+const baseUrl = 'http://localhost:8080/api/products';
 
+// Solo para pruebas locales
 export const listProduct = () => {
     return initProducts;
-}
+};
 
-export const findAll = async () => {
+export const findAll = async (token) => {
     try {
-        return await axios.get(baseUrl);
-    } catch (error) {
-        console.log(error);
-    }
-    return null;
-}
-
-export const create = async ({nombre, cantidad, precio_compra, precio_venta, proveedor, sku}) => {
-    try {
-
-        return await axios.post(baseUrl, {
-            nombre,
-            cantidad,
-            precio_compra,
-            precio_venta,
-            proveedor,
-            sku
+        const response = await axios.get(baseUrl, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         });
+        return response.data;
     } catch (error) {
         console.log(error);
+        throw error; // Esto hace que el error llegue al .catch del componente
     }
-    return undefined;
-}
+};
 
-export const update = async ({id, nombre, cantidad, precio_compra, precio_venta, proveedor, sku}) => {
+export const create = async ({ nombre, cantidad, precioCompra, precioVenta, proveedor, sku }) => {
     try {
-        return await axios.put(`${baseUrl}/${id}`, {
-            id,
-            nombre,
-            cantidad,
-            precio_compra,
-            precio_venta,
-            proveedor,
-            sku
+        const token = localStorage.getItem('tokenJWT');
+        if (!token) {
+            throw new Error('No token found, please log in again.');
+        }
+        const response = await axios.post(
+            baseUrl,
+            { nombre, cantidad, precioCompra, precioVenta, proveedor, sku },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error al crear producto:', error);
+        throw error;
+    }
+};
+
+export const update = async ({ id, nombre, cantidad, precioCompra, precioVenta, proveedor, sku }) => {
+    try {
+        if (!id) {
+            throw new Error('El ID es obligatorio para actualizar');
+        }
+        const token = localStorage.getItem('tokenJWT');
+        if (!token) {
+            throw new Error('No token found, please log in again.');
+        }
+        const response = await axios.put(
+            `${baseUrl}/${id}`,
+            { nombre, cantidad, precioCompra, precioVenta, proveedor, sku },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error al actualizar producto:', error);
+        throw error;
+    }
+};
+
+
+export const remove = async (id) => {
+    try {
+        if (!id) {
+            throw new Error('El ID es obligatorio para eliminar');
+        }
+        const token = localStorage.getItem('tokenJWT');
+        if (!token) {
+            throw new Error('No token found, please log in again.');
+        }
+        await axios.delete(`${baseUrl}/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         });
+        return true;
     } catch (error) {
-        console.log(error);
+        console.error('Error al eliminar producto:', error);
+        throw error;
     }
-    return undefined;
-}
-
-export const remove = async(id) => {
-
-    try {
-        await axios.delete(`${baseUrl}/${id}`);   
-    } catch (error) {
-        console.log(error);
-    }
-}
+};

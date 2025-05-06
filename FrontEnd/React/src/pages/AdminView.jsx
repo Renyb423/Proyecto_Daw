@@ -1,5 +1,5 @@
 import {useAuth} from "@/providers/RoleAuthorization.jsx";
-import LogoutButton from "@/components/LogoutButton.jsx";
+import DashboardLayout from "@/layout/DashboardLayout.jsx";
 
 export default function AdminViewPage() {
 
@@ -10,9 +10,11 @@ export default function AdminViewPage() {
     }
 
     return (
-        <div>
-            <h1>Hola, Admin</h1>
-            <LogoutButton></LogoutButton>
-        </div>
+
+        <>
+            <DashboardLayout>
+
+            </DashboardLayout>
+        </>
     );
 }
