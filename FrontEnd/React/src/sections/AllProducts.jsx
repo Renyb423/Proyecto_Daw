@@ -1,11 +1,14 @@
 
 import { useEffect, useState } from "react";
 import { findAll } from '@/services/ProductService.js';
+import {useAuth} from "@/providers/RoleAuthorization.jsx";
 
 export default function AllProducts() {
     const [products, setProducts] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
+    const auth = useAuth();
+    const role = auth?.user?.role;
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -50,10 +53,12 @@ export default function AllProducts() {
                         <th className="px-4 py-2 text-gray-600 font-bold text-center">ID</th>
                         <th className="px-4 py-2 text-gray-600 font-bold text-center">Nombre</th>
                         <th className="px-4 py-2 text-gray-600 font-bold text-center">SKU</th>
-                        <th className="px-4 py-2 text-gray-600 font-bold text-center">Precio Compra (€)</th>
-                        <th className="px-4 py-2 text-gray-600 font-bold text-center">Precio Venta (€)</th>
                         <th className="px-4 py-2 text-gray-600 font-bold text-center">Stock</th>
+                        <th className="px-4 py-2 text-gray-600 font-bold text-center">Precio Venta (€)</th>
+                        {role === "ROLE_ADMIN" && <>
+                        <th className="px-4 py-2 text-gray-600 font-bold text-center">Precio Compra (€)</th>
                         <th className="px-4 py-2 text-gray-600 font-bold text-center">Proveedor</th>
+                        </>}
                     </tr>
                     </thead>
                     <tbody>
@@ -62,10 +67,12 @@ export default function AllProducts() {
                             <td className="px-4 py-2 text-center">{product.id}</td>
                             <td className="px-4 py-2 text-center">{product.nombre}</td>
                             <td className="px-4 py-2 text-center">{product.sku}</td>
-                            <td className="px-4 py-2 text-center">{product.precioCompra}</td>
-                            <td className="px-4 py-2 text-center">{product.precioVenta}</td>
                             <td className="px-4 py-2 text-center">{product.cantidad}</td>
+                            <td className="px-4 py-2 text-center">{product.precioVenta}</td>
+                            {role === "ROLE_ADMIN" && <>
+                            <td className="px-4 py-2 text-center">{product.precioCompra}</td>
                             <td className="px-4 py-2 text-center">{product.proveedor}</td>
+                            </>}
                         </tr>
                     ))}
                     </tbody>
@@ -88,21 +95,23 @@ export default function AllProducts() {
                             <span>{product.sku}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="font-bold text-indigo-700">Precio Compra (€):</span>
-                            <span>{product.precioCompra}</span>
+                            <span className="font-bold text-indigo-700">Stock:</span>
+                            <span>{product.cantidad}</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="font-bold text-indigo-700">Precio Venta (€):</span>
                             <span>{product.precioVenta}</span>
                         </div>
+                        {role === "ROLE_ADMIN" && <>
                         <div className="flex items-center gap-2">
-                            <span className="font-bold text-indigo-700">Stock:</span>
-                            <span>{product.cantidad}</span>
+                            <span className="font-bold text-indigo-700">Precio Compra (€):</span>
+                            <span>{product.precioCompra}</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="font-bold text-indigo-700">Proveedor:</span>
                             <span>{product.proveedor}</span>
                         </div>
+                        </>}
                     </div>
                 ))}
             </div>

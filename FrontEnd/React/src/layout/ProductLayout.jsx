@@ -107,20 +107,22 @@ export default function ProductLayout() {
                                     <span className="text-lg font-bold text-indigo-700">{producto.cantidad}</span>
                                 </div>
                                 <div className="bg-indigo-50 rounded-lg shadow p-4 flex flex-col items-center">
-                                    <span className="text-gray-500 font-semibold">Precio Compra</span>
-                                    <span className="text-lg font-bold text-indigo-700">{producto.precioCompra}</span>
-                                </div>
-                                <div className="bg-indigo-50 rounded-lg shadow p-4 flex flex-col items-center">
                                     <span className="text-gray-500 font-semibold">Precio Venta</span>
                                     <span className="text-lg font-bold text-indigo-700">{producto.precioVenta}</span>
+                                </div>
+                                {role === "ROLE_ADMIN" && <>
+                                <div className="bg-indigo-50 rounded-lg shadow p-4 flex flex-col items-center">
+                                    <span className="text-gray-500 font-semibold">Precio Compra</span>
+                                    <span className="text-lg font-bold text-indigo-700">{producto.precioCompra}</span>
                                 </div>
                                 <div className="bg-indigo-50 rounded-lg shadow p-4 flex flex-col items-center">
                                     <span className="text-gray-500 font-semibold">Proveedor</span>
                                     <span className="text-lg font-bold text-indigo-700">{producto.proveedor}</span>
                                 </div>
-                                {role === "ROLE_ADMIN" && <>
+
                                     {/* Card extra: Editar */}
-                                    <div className="bg-blue-50 rounded-lg shadow p-4 flex flex-col items-center justify-center">
+                                    <div
+                                        className="bg-blue-50 rounded-lg shadow p-4 flex flex-col items-center justify-center">
                                         <span className="text-blue-700 font-semibold mb-2">¿Deseas editar?</span>
                                         <button
                                             className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition cursor-pointer"
@@ -130,7 +132,8 @@ export default function ProductLayout() {
                                         </button>
                                     </div>
                                     {/* Card extra: Eliminar */}
-                                    <div className="bg-red-50 rounded-lg shadow p-4 flex flex-col items-center justify-center">
+                                    <div
+                                        className="bg-red-50 rounded-lg shadow p-4 flex flex-col items-center justify-center">
                                         <span className="text-red-700 font-semibold mb-2">¿Deseas eliminar?</span>
                                         <button
                                             className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition cursor-pointer"
