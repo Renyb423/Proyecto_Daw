@@ -15,7 +15,7 @@ const initProducts = [
     }
 ];
 
-const baseUrl = 'http://localhost:8080/api/products';
+const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/api/products`;
 
 // Solo para pruebas locales
 export const listProduct = () => {
